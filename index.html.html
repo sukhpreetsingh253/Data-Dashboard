@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Data Visualization Dashboard Pro</title>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y67T1B8CBQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Y67T1B8CBQ', {
+            'page_title': 'Data Visualization Dashboard',
+            'page_location': window.location.href
+        });
+        
+        // Track custom events
+        function trackEvent(category, action, label) {
+            gtag('event', action, {
+                'event_category': category,
+                'event_label': label
+            });
+        }
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.6); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe, #43e97b);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+        
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            animation: pulse 3s infinite;
+        }
+        
+        .subtitle {
+            color: #555;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 0.95em;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            animation: slideIn 1s ease;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.25);
+            margin-bottom: 35px;
+            animation: fadeInUp 1s ease;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+        
+        .file-upload-section {
+            margin-bottom: 25px;
+        }
+        
+        .file-upload {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            padding: 15px 20px;
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+            font-weight: 500;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+            transform: scale(1.02);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.7);
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        .sample-data-btn {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        
+        .sample-data-btn:hover {
+            box-shadow: 0 12px 35px rgba(240, 147, 251, 0.7);
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+        
+        .export-btn:hover {
+            box-shadow: 0 12px 35px rgba(67, 233, 123, 0.7);
+        }
+        
+        .section-divider {
+            text-align: center;
+            margin: 25px 0;
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .quick-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        
+        .quick-sample-btn {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            padding: 18px 25px;
+            font-size: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .quick-sample-btn:hover {
+            box-shadow: 0 12px 35px rgba(79, 172, 254, 0.7);
+            transform: translateY(-5px);
+        }
+        
+        .insight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5);
+            animation: fadeInUp 1.2s ease, glow 3s infinite;
+        }
+        
+        .insight-title {
+            font-size: 1.8em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .insight-icon {
+            font-size: 1.5em;
+            animation: pulse 2s infinite;
+        }
+        
+        .insight-content {
+            font-size: 1.15em;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 1.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.15), transparent);
+            transition: left 0.7s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+        
+        .stat-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: pulse 2.5s infinite;
+        }
+        
+        .stat-value {
+            font-size: 3.2em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 15px 0;
+            letter-spacing: -1px;
+        }
+        
+        .stat-label {
+            color: #555;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 3px solid #f0f0f0;
+            font-size: 1em;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .stat-change {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+        
+        .stat-change.positive {
+            background: rgba(67, 233, 123, 0.2);
+            color: #27ae60;
+        }
+        
+        .stat-change.negative {
+            background: rgba(245, 87, 108, 0.2);
+            color: #e74c3c;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 35px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: all 0.4s;
+            animation: fadeInUp 1.6s ease;
+            border: 2px solid rgba(102, 126, 234, 0.15);
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            border-color: #667eea;
+        }
+        
+        .chart-title {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .chart-icon {
+            font-size: 1.4em;
+        }
+        
+        .data-table {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow-x: auto;
+            animation: fadeInUp 1.8s ease;
+            border: 2px solid rgba(102, 126, 234, 0.15);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.05em;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        tr {
+            transition: all 0.3s;
+        }
+        
+        tr:hover {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.12), transparent);
+            transform: scale(1.01);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border: 4px solid rgba(255,255,255,.4);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .download-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .theme-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            font-weight: 700;
+            color: #667eea;
+            animation: slideIn 1.5s ease;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .file-upload {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            .theme-badge {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-badge">🚀 Pro Version</div>
+    
+    <div class="container">
+        <header>
+            <h1>🌟Data Visualization Dashboard</h1>
+            <p class="subtitle">Transform Your Data into Stunning Interactive Insights with AI-Powered Analytics</p>
+            <div class="badge-container">
+                <span class="badge">✨ 6 Sample Datasets</span>
+                <span class="badge">📊 4 Chart Types</span>
+                <span class="badge">🤖 Smart Insights</span>
+                <span class="badge">💾 CSV Support</span>
+                <span class="badge">📱 Fully Responsive</span>
+                <span class="badge">⚡ Real-time Analysis</span>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="file-upload-section">
+                <div class="file-upload">
+                    <input type="file" id="csvFile" accept=".csv" />
+                    <button onclick="loadData()">📤 Upload & Analyze</button>
+                    <button class="sample-data-btn" onclick="showSamples()">🎲 Sample Data</button>
+                    <button class="export-btn" onclick="exportData()">💾 Export Report</button>
+                </div>
+            </div>
+            
+            <div class="section-divider">⭐ OR TRY INSTANT DATASETS ⭐</div>
+            
+            <div class="quick-samples">
+                <button class="quick-sample-btn" onclick="loadClimateData()">
+                    <span>🌍</span>
+                    <span>Climate Change</span>
+                </button>
+                <button class="quick-sample-btn" onclick="loadAIGrowth()">
+                    <span>🤖</span>
+                    <span>AI Industry</span>
+                </button>
+                <button class="quick-sample-btn" onclick="loadAIModels()">
+                    <span>⚡</span>
+                    <span>AI Models</span>
+                </button>
+                <button class="quick-sample-btn" onclick="loadMLTraining()">
+                    <span>📈</span>
+                    <span>ML Training</span>
+                </button>
+                <button class="quick-sample-btn" onclick="loadAIJobs()">
+                    <span>💼</span>
+                    <span>Job Market</span>
+                </button>
+                <button class="quick-sample-btn" onclick="loadAIvsHuman()">
+                    <span>🧠</span>
+                    <span>AI vs Human</span>
+                </button>
+                <button class="quick-sample-btn" onclick="showExcelTools()" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                    <span>📊</span>
+                    <span>Excel Tools PRO</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Excel Tools Section -->
+        <div id="excelTools" class="hidden" style="animation: fadeInUp 0.8s ease;">
+            <div class="controls" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                <h2 style="margin-bottom: 20px; font-size: 2em; text-align: center;">
+                    📊 Excel Professional Suite
+                </h2>
+                <p style="text-align: center; font-size: 1.2em; margin-bottom: 20px;">
+                    200+ Formulas | VBA Macros | Data Analysis Tools
+                </p>
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <button onclick="showFormulas()" style="background: white; color: #28a745;">
+                        📝 Excel Formulas
+                    </button>
+                    <button onclick="showVBA()" style="background: white; color: #28a745;">
+                        💻 VBA Macros
+                    </button>
+                    <button onclick="showDataAnalysis()" style="background: white; color: #28a745;">
+                        📈 Data Analysis
+                    </button>
+                    <button onclick="hideExcelTools()" style="background: rgba(255,255,255,0.2);">
+                        ← Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formula Section -->
+            <div id="formulaSection" class="hidden">
+                <div class="controls">
+                    <h3 style="font-size: 1.8em; margin-bottom: 15px;">🔍 Search Excel Formulas</h3>
+                    <input type="text" id="formulaSearch" placeholder="Search formulas... (e.g., VLOOKUP, SUM, IF)" 
+                           style="width: 100%; padding: 15px; font-size: 16px; border: 2px solid #28a745; border-radius: 10px;"
+                           onkeyup="searchFormulas()">
+                </div>
+                
+                <div id="formulaList" class="stats-grid"></div>
+            </div>
+
+            <!-- VBA Section -->
+            <div id="vbaSection" class="hidden">
+                <div class="controls">
+                    <h3 style="font-size: 1.8em; margin-bottom: 15px;">💻 VBA Macros Library</h3>
+                    <p style="margin-bottom: 20px;">Ready-to-use VBA code snippets for Excel automation</p>
+                </div>
+                
+                <div id="vbaList" class="charts-grid"></div>
+            </div>
+
+            <!-- Data Analysis Section -->
+            <div id="dataAnalysisSection" class="hidden">
+                <div class="controls">
+                    <h3 style="font-size: 1.8em; margin-bottom: 15px;">📈 Advanced Data Analysis</h3>
+                    <p style="margin-bottom: 20px;">Professional data analysis techniques and tools</p>
+                </div>
+                
+                <div id="analysisTools" class="charts-grid"></div>
+            </div>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <div id="insightBox" class="insight-box">
+                <div class="insight-title">
+                    <span class="insight-icon">💡</span>
+                    <span>AI-Powered Insights</span>
+                </div>
+                <div class="insight-content" id="insightText"></div>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid"></div>
+            
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="chart-icon">📈</span>
+                        <span>Trend Analysis</span>
+                    </div>
+                    <canvas id="lineChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="chart-icon">📊</span>
+                        <span>Comparison View</span>
+                    </div>
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="chart-icon">🥧</span>
+                        <span>Distribution Chart</span>
+                    </div>
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="chart-icon">📉</span>
+                        <span>Multi-Variable Analysis</span>
+                    </div>
+                    <canvas id="areaChart"></canvas>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="chart-title">
+                    <span class="chart-icon">📋</span>
+                    <span>Raw Data Explorer</span>
+                </div>
+                <div id="tableContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chartInstances = {};
+        let currentData = null;
+        let currentDatasetName = 'Unknown Dataset';
+
+        const sampleDatasets = {
+            climate: `Year,Temperature,Rainfall,Humidity,AQI
+2014,27.2,1180,62,145
+2015,27.8,1150,64,152
+2016,28.5,1100,65,158
+2017,28.9,1080,66,165
+2018,29.3,1050,68,172
+2019,29.7,1020,69,180
+2020,30.1,980,70,188
+2021,30.4,950,72,195
+2022,30.8,920,73,203
+2023,31.2,890,75,210
+2024,31.5,860,76,218
+2025,31.8,830,78,225`,
+            
+            aiGrowth: `Year,AI_Users_Million,Investment_Billion,Jobs_Thousand,Research_Papers
+2018,5,10,50,8000
+2019,12,15,65,10000
+2020,25,25,85,12500
+2021,50,40,120,15000
+2022,150,80,180,20000
+2023,300,150,250,28000
+2024,450,220,320,35000
+2025,600,300,400,42000`,
+            
+            aiModels: `Model,Accuracy,Speed_ms,Cost_per_1k,Rating
+GPT_3.5,78,500,0.002,4.2
+GPT_4,92,2000,0.030,4.8
+Claude_3,90,1500,0.015,4.7
+Gemini_Pro,85,1200,0.010,4.4
+LLaMA_3,82,800,0.000,4.3
+Mistral,80,600,0.000,4.1`,
+            
+            mlTraining: `Epoch,Training_Accuracy,Validation_Accuracy,Loss,Time_Min
+1,45,42,2.50,2
+2,58,55,2.10,4
+3,65,62,1.85,6
+4,72,68,1.60,8
+5,78,75,1.35,10
+10,85,82,0.95,20
+15,90,88,0.65,30
+20,93,91,0.45,40
+25,95,93,0.30,50
+30,96,94,0.20,60`,
+            
+            aiJobs: `Year,Jobs_Created,Jobs_Lost,Net_Jobs,Avg_Salary_Lakhs
+2018,50000,30000,20000,8
+2019,75000,45000,30000,10
+2020,100000,60000,40000,12
+2021,150000,80000,70000,15
+2022,220000,100000,120000,18
+2023,310000,125000,185000,22
+2024,420000,150000,270000,26
+2025,550000,175000,375000,30`,
+            
+            aiVsHuman: `Task,Human_Score,AI_Score,Human_Time_Min,AI_Time_Sec
+Image_Recognition,85,98,10,2
+Translation,90,95,30,5
+Data_Analysis,75,92,120,15
+Code_Writing,80,88,60,10
+Content_Writing,92,85,45,8
+Math_Problems,88,95,20,3
+Medical_Diagnosis,82,90,30,5
+Legal_Research,85,88,90,12`
+        };
+
+        function loadClimateData() {
+            currentDatasetName = 'Climate Change Analysis (2014-2025)';
+            parseSampleData(sampleDatasets.climate);
+            trackEvent('Dataset', 'Load', 'Climate Data');
+        }
+
+        function loadAIGrowth() {
+            currentDatasetName = 'AI Industry Explosive Growth';
+            parseSampleData(sampleDatasets.aiGrowth);
+            trackEvent('Dataset', 'Load', 'AI Growth');
+        }
+
+        function loadAIModels() {
+            currentDatasetName = 'AI Model Performance Comparison';
+            parseSampleData(sampleDatasets.aiModels);
+            trackEvent('Dataset', 'Load', 'AI Models');
+        }
+
+        function loadMLTraining() {
+            currentDatasetName = 'Machine Learning Training Progress';
+            parseSampleData(sampleDatasets.mlTraining);
+            trackEvent('Dataset', 'Load', 'ML Training');
+        }
+
+        function loadAIJobs() {
+            currentDatasetName = 'AI Job Market Impact Analysis';
+            parseSampleData(sampleDatasets.aiJobs);
+            trackEvent('Dataset', 'Load', 'AI Jobs');
+        }
+
+        function loadAIvsHuman() {
+            currentDatasetName = 'AI vs Human Performance Comparison';
+            parseSampleData(sampleDatasets.aiVsHuman);
+            trackEvent('Dataset', 'Load', 'AI vs Human');
+        }
+
+        function showSamples() {
+            alert('📊 6 Sample Datasets Available!\n\n🌍 Climate Change Data\n🤖 AI Industry Growth\n⚡ AI Model Comparison\n📈 ML Training Progress\n💼 Job Market Impact\n🧠 AI vs Human Performance\n\nClick any button below to load instantly!');
+        }
+
+        function parseSampleData(csvData) {
+            Papa.parse(csvData, {
+                header: true,
+                dynamicTyping: true,
+                complete: function(results) {
+                    currentData = results.data;
+                    visualizeData(results.data);
+                }
+            });
+        }
+
+        function loadData() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('⚠️ Please select a CSV file first!\n\nTip: You can also try our sample datasets by clicking the buttons below!');
+                return;
+            }
+
+            currentDatasetName = file.name.replace('.csv', '');
+            
+            // Read file as text to save
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvContent = e.target.result;
+                
+                // Parse and visualize
+                Papa.parse(csvContent, {
+                    header: true,
+                    dynamicTyping: true,
+                    complete: function(results) {
+                        currentData = results.data;
+                        
+                        // Save to browser storage
+                        try {
+                            const savedData = {
+                                name: currentDatasetName,
+                                content: csvContent,
+                                timestamp: new Date().toISOString(),
+                                recordCount: results.data.length
+                            };
+                            localStorage.setItem('lastUploadedData', JSON.stringify(savedData));
+                            
+                            alert('✅ File saved successfully!\n\n' + 
+                                  'Dataset: ' + currentDatasetName + '\n' +
+                                  'Records: ' + results.data.length + '\n' +
+                                  'Your data is saved in this browser.');
+                        } catch(err) {
+                            console.log('Storage limit reached');
+                        }
+                        
+                        visualizeData(results.data);
+                    }
+                });
+            };
+            reader.readAsText(file);
+        }
+        
+        // Load previously saved data on page load
+        function loadSavedData() {
+            try {
+                const saved = localStorage.getItem('lastUploadedData');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    const timeSince = Math.floor((Date.now() - new Date(data.timestamp)) / 1000 / 60);
+                    
+                    if (confirm('📁 Found previously uploaded data!\n\n' +
+                               'Dataset: ' + data.name + '\n' +
+                               'Records: ' + data.recordCount + '\n' +
+                               'Uploaded: ' + timeSince + ' minutes ago\n\n' +
+                               'Would you like to restore it?')) {
+                        currentDatasetName = data.name;
+                        Papa.parse(data.content, {
+                            header: true,
+                            dynamicTyping: true,
+                            complete: function(results) {
+                                currentData = results.data;
+                                visualizeData(results.data);
+                            }
+                        });
+                        return true;
+                    }
+                }
+            } catch(err) {
+                console.log('No saved data found');
+            }
+            return false;
+        }
+
+        function visualizeData(data) {
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            destroyCharts();
+            generateInsights(data);
+            createStatistics(data);
+            createCharts(data);
+            createTable(data);
+        }
+
+        function destroyCharts() {
+            Object.values(chartInstances).forEach(chart => chart.destroy());
+            chartInstances = {};
+        }
+
+        function generateInsights(data) {
+            const numericColumns = Object.keys(data[0]).filter(key => 
+                typeof data[0][key] === 'number'
+            );
+
+            if (numericColumns.length === 0) return;
+
+            const firstCol = numericColumns[0];
+            const values = data.map(row => row[firstCol]).filter(v => !isNaN(v));
+            const first = values[0];
+            const last = values[values.length - 1];
+            const change = last - first;
+            const percentChange = ((change / first) * 100).toFixed(1);
+            const trend = change > 0 ? '📈 INCREASING' : '📉 DECREASING';
+            const trendColor = change > 0 ? '#27ae60' : '#e74c3c';
+
+            let insight = `<strong style="font-size: 1.3em;">📊 Dataset:</strong> ${currentDatasetName}<br><br>`;
+            insight += `<strong style="font-size: 1.2em; color: ${trendColor};">🔍 Key Finding:</strong> `;
+            insight += `${firstCol.replace(/_/g, ' ')} is <strong>${trend}</strong> `;
+            insight += `from <strong>${first.toFixed(2)}</strong> to <strong>${last.toFixed(2)}</strong> `;
+            insight += `(<strong style="color: ${trendColor};">${percentChange > 0 ? '+' : ''}${percentChange}%</strong> change)<br><br>`;
+            insight += `<strong>📈 Data Points:</strong> ${data.length} records analyzed | `;
+            insight += `<strong>📊 Variables:</strong> ${numericColumns.length} metrics tracked`;
+
+            document.getElementById('insightText').innerHTML = insight;
+        }
+
+        function createStatistics(data) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = '';
+
+            const numericColumns = Object.keys(data[0]).filter(key => 
+                typeof data[0][key] === 'number'
+            );
+
+            const icons = ['📊', '📈', '💹', '⚡', '🎯', '🔥', '💎', '🌟'];
+
+            numericColumns.slice(0, 6).forEach((col, idx) => {
+                const values = data.map(row => row[col]).filter(v => !isNaN(v));
+                const total = values.reduce((sum, val) => sum + val, 0);
+                const avg = (total / values.length).toFixed(2);
+                const max = Math.max(...values);
+                const min = Math.min(...values);
+                const range = (max - min).toFixed(2);
+                
+                // Calculate trend
+                const first = values[0];
+                const last = values[values.length - 1];
+                const change = ((last - first) / first * 100).toFixed(1);
+                const isPositive = change > 0;
+
+                const statCard = document.createElement('div');
+                statCard.className = 'stat-card';
+                statCard.innerHTML = `
+                    <div class="stat-icon">${icons[idx % icons.length]}</div>
+                    <div class="stat-label">${col.replace(/_/g, ' ')}</div>
+                    <div class="stat-value">${avg}</div>
+                    <div class="stat-label" style="font-size: 0.9em; margin-top: -10px;">Average Value</div>
+                    <div class="stat-details">
+                        <strong>Min:</strong> ${min} | <strong>Max:</strong> ${max}<br>
+                        <strong>Range:</strong> ${range} | <strong>Total:</strong> ${total.toFixed(0)}
+                    </div>
+                    <div class="stat-change ${isPositive ? 'positive' : 'negative'}">
+                        ${isPositive ? '↗' : '↘'} ${change}% Trend
+                    </div>
+                `;
+                statsGrid.appendChild(statCard);
+            });
+        }
+
+        function createCharts(data) {
+            const labels = data.map(row => row[Object.keys(row)[0]]);
+            const numericColumns = Object.keys(data[0]).filter(key => 
+                typeof data[0][key] === 'number'
+            );
+
+            const colors = [
+                { border: 'rgb(102, 126, 234)', bg: 'rgba(102, 126, 234, 0.2)' },
+                { border: 'rgb(118, 75, 162)', bg: 'rgba(118, 75, 162, 0.2)' },
+                { border: 'rgb(240, 147, 251)', bg: 'rgba(240, 147, 251, 0.2)' },
+                { border: 'rgb(79, 172, 254)', bg: 'rgba(79, 172, 254, 0.2)' },
+                { border: 'rgb(67, 233, 123)', bg: 'rgba(67, 233, 123, 0.2)' }
+            ];
+
+            const datasets = numericColumns.slice(0, 4).map((col, idx) => ({
+                label: col.replace(/_/g, ' '),
+                data: data.map(row => row[col]),
+                borderColor: colors[idx].border,
+                backgroundColor: colors[idx].bg,
+                borderWidth: 3,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 10,
+                pointBackgroundColor: colors[idx].border,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }));
+
+            // Line Chart
+            chartInstances.lineChart = new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            display: true, 
+                            position: 'top',
+                            labels: {
+                                font: { size: 13, weight: 'bold' },
+                                padding: 15
+                            }
+                        },
+                        tooltip: { 
+                            mode: 'index', 
+                            intersect: false,
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 }
+                        }
+                    },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        },
+                        x: {
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart with gradient
+            chartInstances.barChart = new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: { labels, datasets: [datasets[0]] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            labels: { font: { size: 13, weight: 'bold' } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        }
+                    }
+                }
+            });
+
+            // Pie Chart
+            const pieData = data.slice(0, 6).map(row => row[numericColumns[0]]);
+            const pieLabels = data.slice(0, 6).map(row => row[Object.keys(row)[0]]);
+            
+            chartInstances.pieChart = new Chart(document.getElementById('pieChart'), {
+                type: 'pie',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: [
+                            'rgb(102, 126, 234)',
+                            'rgb(118, 75, 162)',
+                            'rgb(240, 147, 251)',
+                            'rgb(79, 172, 254)',
+                            'rgb(67, 233, 123)',
+                            'rgb(245, 87, 108)'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { 
+                            display: true, 
+                            position: 'right',
+                            labels: { 
+                                font: { size: 12, weight: 'bold' },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.parsed || 0;
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Area Chart
+            chartInstances.areaChart = new Chart(document.getElementById('areaChart'), {
+                type: 'line',
+                data: { labels, datasets: datasets.map(ds => ({...ds, fill: true, backgroundColor: ds.bg})) },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            labels: { font: { size: 13, weight: 'bold' } }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: false,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        },
+                        x: {
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createTable(data) {
+            const tableContainer = document.getElementById('tableContainer');
+            const columns = Object.keys(data[0]);
+            
+            let tableHTML = '<table><thead><tr>';
+            columns.forEach(col => {
+                tableHTML += `<th>${col.replace(/_/g, ' ')}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            data.forEach(row => {
+                tableHTML += '<tr>';
+                columns.forEach(col => {
+                    const value = row[col];
+                    const formatted = typeof value === 'number' ? value.toFixed(2) : value;
+                    tableHTML += `<td><strong>${formatted}</strong></td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table>';
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        function exportData() {
+            if (!currentData) {
+                alert('⚠️ Please load data first before exporting!');
+                return;
+            }
+            trackEvent('Feature', 'Export', 'Export Data');
+            alert('🎉 EXPORT FEATURE\n\n✅ Data Ready for Export!\n📊 ' + currentData.length + ' records\n\nIn the full version, this would:\n• Save charts as PNG images\n• Generate PDF report\n• Export data to Excel\n• Create PowerPoint slides\n\nYour analysis is complete and ready to present!');
+        }
+
+        // Auto-load climate data on page load for demo
+        setTimeout(() => {
+            if (!loadSavedData()) {
+                loadClimateData();
+            }
+        }, 500);
+
+        // Excel Tools Functions
+        const excelFormulas = [
+            { name: "SUM", category: "Math", description: "Adds all numbers in a range", syntax: "=SUM(A1:A10)", example: "=SUM(10,20,30) = 60" },
+            { name: "AVERAGE", category: "Statistical", description: "Calculates average of numbers", syntax: "=AVERAGE(A1:A10)", example: "=AVERAGE(10,20,30) = 20" },
+            { name: "COUNT", category: "Statistical", description: "Counts cells with numbers", syntax: "=COUNT(A1:A10)", example: "=COUNT(1,2,3,text) = 3" },
+            { name: "MAX", category: "Statistical", description: "Returns largest value", syntax: "=MAX(A1:A10)", example: "=MAX(5,10,3) = 10" },
+            { name: "MIN", category: "Statistical", description: "Returns smallest value", syntax: "=MIN(A1:A10)", example: "=MIN(5,10,3) = 3" },
+            { name: "IF", category: "Logical", description: "Returns value based on condition", syntax: "=IF(A1>10,\"Yes\",\"No\")", example: "=IF(15>10,\"Yes\",\"No\") = Yes" },
+            { name: "VLOOKUP", category: "Lookup", description: "Searches vertically in table", syntax: "=VLOOKUP(value,table,col,FALSE)", example: "=VLOOKUP(\"Apple\",A1:B10,2,FALSE)" },
+            { name: "HLOOKUP", category: "Lookup", description: "Searches horizontally in table", syntax: "=HLOOKUP(value,table,row,FALSE)", example: "=HLOOKUP(\"Sales\",A1:Z2,2,FALSE)" },
+            { name: "INDEX", category: "Lookup", description: "Returns value at intersection", syntax: "=INDEX(A1:B10,2,1)", example: "=INDEX(A1:C5,3,2)" },
+            { name: "MATCH", category: "Lookup", description: "Returns position of value", syntax: "=MATCH(value,range,0)", example: "=MATCH(\"Apple\",A1:A10,0)" },
+            { name: "SUMIF", category: "Math", description: "Sums cells matching criteria", syntax: "=SUMIF(range,criteria,sum_range)", example: "=SUMIF(A1:A10,\">100\",B1:B10)" },
+            { name: "COUNTIF", category: "Statistical", description: "Counts cells matching criteria", syntax: "=COUNTIF(range,criteria)", example: "=COUNTIF(A1:A10,\">50\")" },
+            { name: "AVERAGEIF", category: "Statistical", description: "Average cells matching criteria", syntax: "=AVERAGEIF(range,criteria)", example: "=AVERAGEIF(A1:A10,\">10\")" },
+            { name: "CONCATENATE", category: "Text", description: "Joins text strings", syntax: "=CONCATENATE(text1,text2)", example: "=CONCATENATE(\"Hello\",\" \",\"World\")" },
+            { name: "LEFT", category: "Text", description: "Extracts left characters", syntax: "=LEFT(text,num_chars)", example: "=LEFT(\"Hello\",2) = He" },
+            { name: "RIGHT", category: "Text", description: "Extracts right characters", syntax: "=RIGHT(text,num_chars)", example: "=RIGHT(\"Hello\",2) = lo" },
+            { name: "MID", category: "Text", description: "Extracts middle characters", syntax: "=MID(text,start,num)", example: "=MID(\"Hello\",2,3) = ell" },
+            { name: "TRIM", category: "Text", description: "Removes extra spaces", syntax: "=TRIM(text)", example: "=TRIM(\"  Hello  \") = Hello" },
+            { name: "UPPER", category: "Text", description: "Converts to uppercase", syntax: "=UPPER(text)", example: "=UPPER(\"hello\") = HELLO" },
+            { name: "LOWER", category: "Text", description: "Converts to lowercase", syntax: "=LOWER(text)", example: "=LOWER(\"HELLO\") = hello" },
+            { name: "PROPER", category: "Text", description: "Capitalizes first letter", syntax: "=PROPER(text)", example: "=PROPER(\"hello world\") = Hello World" },
+            { name: "LEN", category: "Text", description: "Returns text length", syntax: "=LEN(text)", example: "=LEN(\"Hello\") = 5" },
+            { name: "SUBSTITUTE", category: "Text", description: "Replaces text", syntax: "=SUBSTITUTE(text,old,new)", example: "=SUBSTITUTE(\"Hi Bob\",\"Bob\",\"Alice\")" },
+            { name: "TEXT", category: "Text", description: "Formats number as text", syntax: "=TEXT(value,format)", example: "=TEXT(1234.5,\"$#,##0.00\")" },
+            { name: "DATE", category: "Date/Time", description: "Creates date", syntax: "=DATE(year,month,day)", example: "=DATE(2024,12,25)" },
+            { name: "TODAY", category: "Date/Time", description: "Returns current date", syntax: "=TODAY()", example: "=TODAY() = 10/25/2025" },
+            { name: "NOW", category: "Date/Time", description: "Returns current date/time", syntax: "=NOW()", example: "=NOW() = 10/25/2025 14:30" },
+            { name: "YEAR", category: "Date/Time", description: "Extracts year from date", syntax: "=YEAR(date)", example: "=YEAR(\"1/1/2024\") = 2024" },
+            { name: "MONTH", category: "Date/Time", description: "Extracts month from date", syntax: "=MONTH(date)", example: "=MONTH(\"3/15/2024\") = 3" },
+            { name: "DAY", category: "Date/Time", description: "Extracts day from date", syntax: "=DAY(date)", example: "=DAY(\"3/15/2024\") = 15" },
+            { name: "WEEKDAY", category: "Date/Time", description: "Returns day of week", syntax: "=WEEKDAY(date)", example: "=WEEKDAY(\"1/1/2024\") = 2" },
+            { name: "ROUND", category: "Math", description: "Rounds to specified digits", syntax: "=ROUND(number,digits)", example: "=ROUND(3.14159,2) = 3.14" },
+            { name: "ROUNDUP", category: "Math", description: "Rounds up", syntax: "=ROUNDUP(number,digits)", example: "=ROUNDUP(3.14,1) = 3.2" },
+            { name: "ROUNDDOWN", category: "Math", description: "Rounds down", syntax: "=ROUNDDOWN(number,digits)", example: "=ROUNDDOWN(3.99,0) = 3" },
+            { name: "ABS", category: "Math", description: "Returns absolute value", syntax: "=ABS(number)", example: "=ABS(-5) = 5" },
+            { name: "POWER", category: "Math", description: "Raises to power", syntax: "=POWER(number,power)", example: "=POWER(2,3) = 8" },
+            { name: "SQRT", category: "Math", description: "Returns square root", syntax: "=SQRT(number)", example: "=SQRT(16) = 4" },
+            { name: "MOD", category: "Math", description: "Returns remainder", syntax: "=MOD(number,divisor)", example: "=MOD(10,3) = 1" },
+            { name: "RAND", category: "Math", description: "Random number 0-1", syntax: "=RAND()", example: "=RAND() = 0.537" },
+            { name: "RANDBETWEEN", category: "Math", description: "Random integer in range", syntax: "=RANDBETWEEN(bottom,top)", example: "=RANDBETWEEN(1,100)" },
+            { name: "AND", category: "Logical", description: "Returns TRUE if all TRUE", syntax: "=AND(condition1,condition2)", example: "=AND(5>3,10>5) = TRUE" },
+            { name: "OR", category: "Logical", description: "Returns TRUE if any TRUE", syntax: "=OR(condition1,condition2)", example: "=OR(5>10,10>5) = TRUE" },
+            { name: "NOT", category: "Logical", description: "Reverses logical value", syntax: "=NOT(logical)", example: "=NOT(TRUE) = FALSE" },
+            { name: "IFERROR", category: "Logical", description: "Returns value if error", syntax: "=IFERROR(value,value_if_error)", example: "=IFERROR(A1/B1,\"Error\")" },
+            { name: "SUMIFS", category: "Math", description: "Sum with multiple criteria", syntax: "=SUMIFS(sum_range,criteria_range1,criteria1)", example: "=SUMIFS(C:C,A:A,\"Apple\",B:B,\">100\")" },
+            { name: "COUNTIFS", category: "Statistical", description: "Count with multiple criteria", syntax: "=COUNTIFS(criteria_range1,criteria1)", example: "=COUNTIFS(A:A,\"Apple\",B:B,\">100\")" },
+            { name: "AVERAGEIFS", category: "Statistical", description: "Average with multiple criteria", syntax: "=AVERAGEIFS(avg_range,criteria_range1,criteria1)", example: "=AVERAGEIFS(C:C,A:A,\"Apple\")" },
+            { name: "XLOOKUP", category: "Lookup", description: "Modern lookup function", syntax: "=XLOOKUP(lookup,array,return)", example: "=XLOOKUP(\"Apple\",A:A,B:B)" },
+            { name: "FILTER", category: "Array", description: "Filters array based on criteria", syntax: "=FILTER(array,include)", example: "=FILTER(A1:C10,B1:B10>100)" },
+            { name: "SORT", category: "Array", description: "Sorts array", syntax: "=SORT(array,sort_index)", example: "=SORT(A1:C10,2,1)" },
+            { name: "UNIQUE", category: "Array", description: "Returns unique values", syntax: "=UNIQUE(array)", example: "=UNIQUE(A1:A100)" }
+        ];
+
+        const vbaMacros = [
+            { 
+                name: "Auto Save Workbook", 
+                description: "Automatically saves workbook every 5 minutes",
+                code: `Sub AutoSaveWorkbook()
+    Application.OnTime Now + TimeValue("00:05:00"), "AutoSaveWorkbook"
+    ThisWorkbook.Save
+End Sub`
+            },
+            {
+                name: "Clear All Filters",
+                description: "Removes all filters from active sheet",
+                code: `Sub ClearAllFilters()
+    On Error Resume Next
+    ActiveSheet.ShowAllData
+    On Error GoTo 0
+End Sub`
+            },
+            {
+                name: "Delete Empty Rows",
+                description: "Deletes all empty rows in selection",
+                code: `Sub DeleteEmptyRows()
+    Dim rng As Range
+    For Each rng In Selection.Rows
+        If WorksheetFunction.CountA(rng) = 0 Then
+            rng.Delete
+        End If
+    Next rng
+End Sub`
+            },
+            {
+                name: "Export to PDF",
+                description: "Exports active sheet to PDF",
+                code: `Sub ExportToPDF()
+    Dim FilePath As String
+    FilePath = ThisWorkbook.Path & "\\" & ActiveSheet.Name & ".pdf"
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:=FilePath
+    MsgBox "Exported to: " & FilePath
+End Sub`
+            },
+            {
+                name: "Highlight Duplicates",
+                description: "Highlights duplicate values in red",
+                code: `Sub HighlightDuplicates()
+    Dim rng As Range
+    Dim cell As Range
+    Set rng = Selection
+    For Each cell In rng
+        If WorksheetFunction.CountIf(rng, cell.Value) > 1 Then
+            cell.Interior.Color = RGB(255, 0, 0)
+        End If
+    Next cell
+End Sub`
+            },
+            {
+                name: "Create Pivot Table",
+                description: "Creates pivot table from data",
+                code: `Sub CreatePivotTable()
+    Dim pt As PivotTable
+    Dim pc As PivotCache
+    Set pc = ActiveWorkbook.PivotCaches.Create(xlDatabase, Range("A1").CurrentRegion)
+    Set pt = pc.CreatePivotTable("Sheet2!R1C1", "PivotTable1")
+End Sub`
+            }
+        ];
+
+        const dataAnalysisTools = [
+            {
+                name: "Descriptive Statistics",
+                description: "Calculate mean, median, mode, std dev",
+                steps: ["Select data range", "Data → Data Analysis → Descriptive Statistics", "Check Summary Statistics", "Click OK"]
+            },
+            {
+                name: "Correlation Analysis",
+                description: "Find relationships between variables",
+                steps: ["Prepare data in columns", "Data → Data Analysis → Correlation", "Select input range", "View correlation matrix"]
+            },
+            {
+                name: "Regression Analysis",
+                description: "Predict values and find trends",
+                steps: ["Organize X and Y data", "Data → Data Analysis → Regression", "Select Y and X ranges", "Interpret R-squared"]
+            },
+            {
+                name: "Histogram",
+                description: "Visualize data distribution",
+                steps: ["Select data", "Insert → Charts → Histogram", "Format bins", "Add labels and title"]
+            },
+            {
+                name: "Pivot Table Analysis",
+                description: "Summarize and analyze large datasets",
+                steps: ["Select data range", "Insert → Pivot Table", "Drag fields to areas", "Apply filters and calculations"]
+            },
+            {
+                name: "What-If Analysis",
+                description: "Scenario planning and goal seek",
+                steps: ["Data → What-If Analysis", "Choose Goal Seek or Scenario Manager", "Set target and variables", "View results"]
+            }
+        ];
+
+        function showExcelTools() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('excelTools').classList.remove('hidden');
+            showFormulas();
+        }
+
+        function hideExcelTools() {
+            document.getElementById('excelTools').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        function showFormulas() {
+            document.getElementById('formulaSection').classList.remove('hidden');
+            document.getElementById('vbaSection').classList.add('hidden');
+            document.getElementById('dataAnalysisSection').classList.add('hidden');
+            displayFormulas(excelFormulas);
+        }
+
+        function showVBA() {
+            document.getElementById('formulaSection').classList.add('hidden');
+            document.getElementById('vbaSection').classList.remove('hidden');
+            document.getElementById('dataAnalysisSection').classList.add('hidden');
+            displayVBAMacros();
+        }
+
+        function showDataAnalysis() {
+            document.getElementById('formulaSection').classList.add('hidden');
+            document.getElementById('vbaSection').classList.add('hidden');
+            document.getElementById('dataAnalysisSection').classList.remove('hidden');
+            displayDataAnalysis();
+        }
+
+        function displayFormulas(formulas) {
+            const container = document.getElementById('formulaList');
+            container.innerHTML = '';
+            
+            formulas.forEach(formula => {
+                const card = document.createElement('div');
+                card.className = 'stat-card';
+                card.style.textAlign = 'left';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="color: #28a745; font-size: 1.5em; margin: 0;">${formula.name}</h3>
+                        <span style="background: #28a745; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em;">${formula.category}</span>
+                    </div>
+                    <p style="color: #666; margin: 10px 0;"><strong>Description:</strong> ${formula.description}</p>
+                    <p style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; color: #333;"><strong>Syntax:</strong> ${formula.syntax}</p>
+                    <p style="color: #555; margin-top: 10px;"><strong>Example:</strong> ${formula.example}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function searchFormulas() {
+            const search = document.getElementById('formulaSearch').value.toLowerCase();
+            const filtered = excelFormulas.filter(f => 
+                f.name.toLowerCase().includes(search) || 
+                f.description.toLowerCase().includes(search) ||
+                f.category.toLowerCase().includes(search)
+            );
+            displayFormulas(filtered);
+        }
+
+        function displayVBAMacros() {
+            const container = document.getElementById('vbaList');
+            container.innerHTML = '';
+            
+            vbaMacros.forEach(macro => {
+                const card = document.createElement('div');
+                card.className = 'chart-container';
+                card.innerHTML = `
+                    <h3 style="color: #28a745; font-size: 1.4em; margin-bottom: 10px;">💻 ${macro.name}</h3>
+                    <p style="color: #666; margin-bottom: 15px;">${macro.description}</p>
+                    <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 14px;"><code>${macro.code}</code></pre>
+                    <button onclick="copyCode(this)" style="margin-top: 15px; background: #28a745;">📋 Copy Code</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function displayDataAnalysis() {
+            const container = document.getElementById('analysisTools');
+            container.innerHTML = '';
+            
+            dataAnalysisTools.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'chart-container';
+                card.innerHTML = `
+                    <h3 style="color: #28a745; font-size: 1.4em; margin-bottom: 10px;">📊 ${tool.name}</h3>
+                    <p style="color: #666; margin-bottom: 15px;">${tool.description}</p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <strong style="color: #333;">Steps:</strong>
+                        <ol style="margin: 10px 0; padding-left: 20px;">
+                            ${tool.steps.map(step => `<li style="margin: 8px 0; color: #555;">${step}</li>`).join('')}
+                        </ol>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function copyCode(button) {
+            const code = button.previousElementSibling.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = '📋 Copy Code';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
